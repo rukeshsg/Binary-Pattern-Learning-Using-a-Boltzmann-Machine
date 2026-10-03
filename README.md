@@ -72,28 +72,29 @@ An RBM is an undirected bipartite graphical model with symmetric weight connecti
 
 ```mermaid
 graph TD
-    subgraph Visible Layer [Visible Layer: 25 Units - 5x5 Binary Pixel Grid]
-        V1[Pixel 1]
-        V2[Pixel 2]
-        V3[Pixel 3]
-        VDots[...]
-        V25[Pixel 25]
+    subgraph Visible_Layer ["Visible Layer: 25 Units (5x5 Binary Grid)"]
+        V1["v1: Pixel 1"]
+        V2["v2: Pixel 2"]
+        V3["v3: Pixel 3"]
+        VDots["..."]
+        V25["v25: Pixel 25"]
     end
 
-    subgraph Hidden Layer [Hidden Layer: 24 Latent Feature Detectors]
-        H1[Hidden Unit 1]
-        H2[Hidden Unit 2]
-        H3[Hidden Unit 3]
-        HDots[...]
-        H24[Hidden Unit 24]
+    subgraph Hidden_Layer ["Hidden Layer: 24 Latent Units"]
+        H1["h1: Hidden 1"]
+        H2["h2: Hidden 2"]
+        H3["h3: Hidden 3"]
+        HDots["..."]
+        H24["h24: Hidden 24"]
     end
 
-    Visible Layer <== Symmetric Weights W (25x24) ==> Hidden Layer
-    
-    subgraph Biases
-        A[Visible Bias a: 25x1] -.-> Visible Layer
-        B[Hidden Bias b: 24x1] -.-> Hidden Layer
-    end
+    V1 <-->|Symmetric Weights W| H1
+    V2 <--> H2
+    V3 <--> H3
+    V25 <--> H24
+
+    A["Visible Bias Vector a (25x1)"] -.-> Visible_Layer
+    B["Hidden Bias Vector b (24x1)"] -.-> Hidden_Layer
 ```
 
 ### 5.2 Mathematical Formulation
@@ -128,21 +129,21 @@ $$F(\mathbf{v}) = -\ln \sum_{\mathbf{h}} e^{-E(\mathbf{v}, \mathbf{h})} = -\math
 
 ```mermaid
 flowchart TD
-    subgraph Phase 1: Training Workflow
-        A[Load 8 Clean Canonical Patterns<br/>5x5 Binary Grid] --> B[Prepare Training Basis<br/>Clean Prototypes + Legitimate Variations]
-        B --> C[Mini-Batch Contrastive Divergence CD-1<br/>lr=0.04, 500 Epochs, Momentum 0.5->0.9]
-        C --> D[Energy Surface Convergence<br/>MSE Loss Minimization]
-        D --> E[Trained RBM Model]
+    subgraph Phase_1 ["Phase 1: Training Workflow"]
+        A["Load 8 Clean Canonical Patterns<br/>(5x5 Binary Grid)"] --> B["Prepare Training Basis<br/>(Clean Prototypes + Variations)"]
+        B --> C["Mini-Batch Contrastive Divergence CD-1<br/>(lr=0.04, 500 Epochs, Momentum 0.5->0.9)"]
+        C --> D["Energy Surface Convergence<br/>(MSE Loss Minimization)"]
+        D --> E["Trained RBM Model"]
     end
 
-    subgraph Phase 2: Reconstruction Workflow
-        F[Clean Ground Truth] --> G[Inject 20% Bit-Flip Noise<br/>Flip Exactly 5 Pixels per Pattern]
-        G --> H[Corrupted Noisy Test Patterns]
-        E --> I[Multi-Step Gibbs Denoising<br/>v_noisy -> h -> v -> h -> v_recon]
+    subgraph Phase_2 ["Phase 2: Reconstruction Workflow"]
+        F["Clean Ground Truth"] --> G["Inject 20% Bit-Flip Noise<br/>(Flip Exactly 5 Pixels)"]
+        G --> H["Corrupted Noisy Test Patterns"]
+        E --> I["Multi-Step Gibbs Denoising<br/>(v_noisy -> h -> v -> h -> v_recon)"]
         H --> I
-        I --> J[Threshold Probabilities at 0.5]
-        J --> K[Reconstructed Binary Patterns]
-        K --> L[Evaluate Accuracy & Error vs Clean Ground Truth]
+        I --> J["Threshold Probabilities at 0.5"]
+        J --> K["Reconstructed Binary Patterns"]
+        K --> L["Evaluate Accuracy & Error vs Ground Truth"]
     end
 ```
 
